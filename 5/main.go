@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
-	"sort"
 	"strings"
 )
 
@@ -19,12 +18,6 @@ type input struct {
 	seatID      int
 }
 
-type bySeatID *[]input
-
-func (a bySeatID) Len() int           { return len(&a) }
-func (a bySeatID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a bySeatID) Less(i, j int) bool { return a[i].seatID < a[j].seatID }
-
 func main() {
 	formedInput := parseToMem()
 	assignRow(&formedInput)
@@ -32,20 +25,19 @@ func main() {
 	assignIndex(&formedInput)
 	largestInput := findLargestSeatID(&formedInput)
 	fmt.Println("pt 1. max:", largestInput.seatID)
-	seatID := findMissingIDs(&formedInput)
-	fmt.Println("pt 2. seatID:", seatID)
-
+	fmt.Println("pt 2. sublime text sort")
+	fmt.Println(formedInput)
 }
 
 // func parseLine(line string) input {
-func parseToMem() []bySeatID {
+func parseToMem() []input {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 
 	lines := strings.Split(string(dat), "\n")
-	formedInput := make(bySeatID, len(lines))
+	formedInput := make([]input, len(lines))
 	for i := 0; i < len(lines); i++ {
 		formedInput[i].inputString = lines[i]
 	}
@@ -108,11 +100,4 @@ func binarySplit(raw, low, high string) (int, error) {
 		return 0, fmt.Errorf("couldn't settle on single val, low = %d, high = %d", within[0], within[1])
 	}
 	return within[0], nil
-}
-
-func findMissingIDs(f *[]input) int {
-	missingIDs := make([]int, 4)
-	sort.Sort(ByAge(*[]input))
-	fmt.Println("missingIDs", missingIDs)
-	return missingIDs[0]
 }
