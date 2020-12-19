@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -16,8 +15,7 @@ type input struct {
 	password string
 }
 
-// var filename = "example.txt"
-var filename = "input.txt"
+var filename = "example.txt"
 
 func main() {
 	file, err := os.Open(filename)
@@ -27,14 +25,8 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	totalAcceptable := 0
 	for scanner.Scan() {
-		candidate := parseLine(scanner.Text())
-		count := strings.Count(candidate.password, candidate.char)
-		if count >= candidate.min && count <= candidate.max {
-			totalAcceptable++
-		}
-		fmt.Println("totalAcceptable =", totalAcceptable)
+		parseLine(scanner.Text())
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -44,18 +36,14 @@ func main() {
 }
 
 func parseLine(line string) input {
+	fmt.Println(line)
+	var a input
 	dashSplit := strings.Split(line, "-")
-	min, err := strconv.Atoi(dashSplit[0])
-	if err != nil {
-		log.Fatal(err)
-	}
-	spaceSplit := strings.Split(dashSplit[1], " ")
-	max, err := strconv.Atoi(spaceSplit[0])
-	if err != nil {
-		log.Fatal(err)
-	}
+	min := dashSplit[0]
+	max := strings.Split(dashSplit[1], " ")[0]
 	charIndex := strings.Index(line, ":")
-	char := string(line[charIndex-1])
-	password := spaceSplit[len(spaceSplit)-1]
-	return input{min, max, char, password}
+	fmt.Println("min =", min)
+	fmt.Println("max =", max)
+	fmt.Println("charIndex =", charIndex)
+	return a
 }
