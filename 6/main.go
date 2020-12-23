@@ -11,13 +11,18 @@ type group []person
 type person []rune
 
 // var filename string = "input.txt"
+
 var filename string = "example.txt"
 
 func main() {
 	var parsedPlane plane
 	parsedPlane = parsePlane(filename)
-	printPlane(&parsedPlane)
-	int := sumGroupYeses(&parsedPlane)
+	totalYeses := sumPlaneYeses(&parsedPlane)
+	fmt.Println("totalYeses:", totalYeses)
+	fmt.Println("part1 complete")
+	sharedYeses := sumSharedYeses(&parsedPlane)
+	fmt.Println("sharedYeses:", sharedYeses)
+
 }
 
 func parsePlane(file string) plane {
@@ -48,21 +53,58 @@ func parsePlane(file string) plane {
 	return formedPlane
 }
 
-func sumGroupYeses(pl *plane) int {
+func sumPlaneYeses(pl *plane) int {
 	totalYeses := 0
-	for i, grp := range *pl {
+	for _, grp := range *pl {
 		thisGroupYeses := getGroupYeses(&grp)
-		fmt.Printf("grp %d yeses: %d", i, thisGroupYeses)
-		totalYeses = +thisGroupYeses
+		totalYeses = totalYeses + thisGroupYeses
 	}
 	return totalYeses
 }
 
 func getGroupYeses(grp *group) int {
-	uniqueYeses := make([]string, 0)
-	for _, prsn := range *grp {
+	uniqueYeses := make(map[rune]int)
+	res := make([]rune, 0)
+	var rawJoined []rune
+	for _, prs := range *grp {
+		rawJoined = append(rawJoined, prs...)
 	}
-	return len(uniqueYeses)
+	for _, char := range rawJoined {
+		uniqueYeses[char] = 1
+	}
+	for letter := range uniqueYeses {
+		res = append(res, letter)
+	}
+	return len(res)
+}
+
+func sumSharedYeses(pl *plane) int {
+	totalYeses := 0
+	for _, grp := range *pl {
+		thisGroupYeses := groupSharedYeses(&grp)
+		totalYeses = totalYeses + thisGroupYeses
+	}
+	return totalYeses
+}
+
+func groupSharedYeses(grp *group) int {
+	uniqueYeses := make(map[rune]int)
+	var rawJoined []rune
+	res := make([]rune, 0)
+	for _, prs := range *grp {
+		rawJoined = append(rawJoined, prs...)
+	}
+	for _, char := range rawJoined {
+		uniqueYeses[char] = uniqueYeses[char] + 1
+	}
+	for letter, i := range uniqueYeses {
+		if i == len(*grp) {
+			res = append(res, letter)
+		}
+	}
+	return len(res)
+
+	return 0
 }
 
 func printPlane(pl *plane) {
