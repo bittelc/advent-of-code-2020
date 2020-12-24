@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -22,7 +24,9 @@ type allBags []bag
 
 func main() {
 	fmt.Println("beginning")
-	_ = parseAllBags()
+	aB := parseAllBags()
+	printAllBags(&aB)
+	// all := parseAllBags()
 }
 
 func parseAllBags() allBags {
@@ -30,13 +34,55 @@ func parseAllBags() allBags {
 	if err != nil {
 		panic(err)
 	}
-
 	all := make(allBags, 0)
 	lines := strings.Split(string(dat), "\n")
 	for i := 0; i < len(lines); i++ {
-		selfBag := strings.Split(string(lines[i]), " bags ")[0]
-		log.Println("selfBag:", selfBag)
-	}
-	return all
 
+		// establish first level of tree
+		selfDesc := strings.Split(string(lines[i]), " bags ")[0]
+		parsedBag := bag{selfDesc: selfDesc}
+		parsedBag.children = make(map[*bag]int)
+
+		// parse children of first level
+		rawChildBags := strings.Split(string(lines[i]), " contain ")[1]
+		splitter := regexp.MustCompile(` bag(s*)((\.)|(, ))`)
+		allChildBags := splitter.Split(rawChildBags, -1)
+		log.Printf("selfBag: \"%s\", childBags: \"%#v\", len(childBags): %d", selfDesc, allChildBags, len(allChildBags))
+		for i := 0; i < len(allChildBags)-1; i++ {
+			bagStr := allChildBags[i]
+			numBag := strings.Split(bagStr, " ")[0]
+			if numBag == "no" {
+				continue
+			}
+			typeBag := strings.SplitN(bagStr, " ", 2)[1]
+			baag := bag{selfDesc: typeBag}
+			log.Printf("numBag: %s, typeBag: %s", numBag, typeBag)
+			parsedBag.children[&baag], err = strconv.Atoi(numBag)
+			if err != nil {
+				panic(err)
+			}
+			log.Printf("parsedBag.children: %#v", parsedBag.children)
+		}
+
+		all = append(all, parsedBag)
+
+	}
+	log.Println("len(allBags):", len(all))
+	return all
+}
+
+func printAllBags(aB *allBags) {
+	fmt.Println("len(allBags):", len(*aB))
+	for _, baag := range *aB {
+		printBag(&baag, "")
+	}
+}
+
+func printBag(b *bag, prefix string) {
+	fmt.Printf("%s  bag.selfDesc: %s\n", prefix, (*b).selfDesc)
+	fmt.Printf("%s  bag.containsMyBag: %t\n", prefix, (*b).containsMyBag)
+	fmt.Printf("%s  bag.children:\n", prefix)
+	for childBag := range (*b).children {
+		printBag(childBag, fmt.Sprintf("%s  ", prefix))
+	}
 }
