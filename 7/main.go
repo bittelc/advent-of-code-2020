@@ -25,8 +25,14 @@ type allBags []bag
 func main() {
 	fmt.Println("beginning")
 	aB := parseAllBags()
-	printAllBags(&aB)
-	// all := parseAllBags()
+	// printAllBags(&aB)
+	createTree(&aB)
+}
+
+func createTree(aB *allBags) {
+	for i, baag := range *aB {
+
+	}
 }
 
 func parseAllBags() allBags {
@@ -74,15 +80,17 @@ func parseAllBags() allBags {
 func printAllBags(aB *allBags) {
 	fmt.Println("len(allBags):", len(*aB))
 	for _, baag := range *aB {
-		printBag(&baag, "")
+		fmt.Println("----")
+		printBag(&baag, "", 1)
 	}
 }
 
-func printBag(b *bag, prefix string) {
+func printBag(b *bag, prefix string, depth int) {
+	fmt.Printf("%s  depth: %d\n", prefix, depth)
 	fmt.Printf("%s  bag.selfDesc: %s\n", prefix, (*b).selfDesc)
 	fmt.Printf("%s  bag.containsMyBag: %t\n", prefix, (*b).containsMyBag)
-	fmt.Printf("%s  bag.children:\n", prefix)
 	for childBag := range (*b).children {
-		printBag(childBag, fmt.Sprintf("%s  ", prefix))
+		fmt.Printf("%s  bag.child:\n", prefix)
+		printBag(childBag, fmt.Sprintf("%s  ", prefix), depth+1)
 	}
 }
