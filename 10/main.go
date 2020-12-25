@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -16,12 +17,41 @@ var filename string = "input.txt"
 type allAdaptors []int
 
 func main() {
-	fmt.Println("beginning")
 	aA := parseInput()
 	// printAllAdaptors(&aA)
 	differences := findStepDifferences(&aA)
 	fmt.Println("differences:", differences)
+	fmt.Println("----- pt II ------:")
+	allVariations := findVariations(&aA)
+	fmt.Println("allVariations:", allVariations)
+}
 
+func findVariations(aA *allAdaptors) int64 {
+	possible := make(map[int][]int)
+	possible[0] = []int{1, 2, 3}
+	for _, val := range *aA {
+		possible[val] = []int{val + 1, val + 2, val + 3}
+	}
+	return connections(possible, make(map[int]int), (*aA)[len(*aA)-1]+3, 0)
+}
+
+func connections(possible map[int][]int, memo map[int]int, target int, currPos int) int64 {
+	if value, seen := memo[currPos]; seen {
+		return int64(value)
+	}
+
+	value := int64(0)
+	for _, current := range possible[currPos] {
+		if current != target {
+			value += connections(possible, memo, target, current)
+			continue
+		}
+
+		value++
+	}
+
+	memo[currPos] = int(value)
+	return value
 }
 
 func findStepDifferences(aA *allAdaptors) int {
@@ -31,7 +61,6 @@ func findStepDifferences(aA *allAdaptors) int {
 	for {
 		oneStep := isOneStepDifference(aA, currentJoltage)
 		if oneStep {
-			fmt.Printf("diff by one, currentJoltage: %d, diffByOne: %d, diffByThree: %d\n", currentJoltage, diffByOne, diffByThree)
 			currentJoltage++
 			diffByOne++
 			continue
@@ -43,14 +72,12 @@ func findStepDifferences(aA *allAdaptors) int {
 		}
 		threeStep := isThreeStepDifference(aA, currentJoltage)
 		if threeStep == true {
-			fmt.Printf("diff by three, currentJoltage: %d, diffByOne: %d, diffByThree: %d\n", currentJoltage, diffByOne, diffByThree)
 			currentJoltage = currentJoltage + 3
 			diffByThree++
 			continue
 		}
 		break
 	}
-	fmt.Printf("currentJoltage: %d, diffByOne: %d, diffByThree: %d\n", currentJoltage, diffByOne, diffByThree)
 	return diffByOne * diffByThree
 }
 
@@ -95,7 +122,7 @@ func parseInput() allAdaptors {
 		}
 		all = append(all, toI)
 	}
-
+	sort.Ints(all)
 	return all
 }
 
