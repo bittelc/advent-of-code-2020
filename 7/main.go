@@ -8,9 +8,11 @@ import (
 	"strings"
 )
 
-// var filename string = "example.txt"
+var filename string = "example.txt"
 
-var filename string = "input.txt"
+// var filename string = "example2.txt"
+// var filename string = "example2.txt"
+
 var myBag = "shiny gold"
 
 type allBags map[string][]string
@@ -21,6 +23,7 @@ func main() {
 	// printAllBags(&aB)
 	count := findCount(&aB)
 	log.Println("count:", count)
+	log.Println("pt 1 complete")
 }
 
 func findCount(aB *allBags) int {
