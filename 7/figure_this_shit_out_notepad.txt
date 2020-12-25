@@ -1,0 +1,7 @@
+allBags {
+    "dark orange":
+        -"bright white"
+        -"muted yellow"
+    "bright white"
+        "shiny yellow"
+}
