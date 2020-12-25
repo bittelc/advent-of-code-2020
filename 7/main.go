@@ -8,23 +8,44 @@ import (
 	"strings"
 )
 
-var filename string = "example.txt"
+// var filename string = "example.txt"
 
-// var filename string = "input.txt"
+var filename string = "input.txt"
 var myBag = "shiny gold"
-
-// type bag struct {
-// 	children      map[*bag]int
-// 	selfDesc      string
-// 	containsMyBag bool
-// }
 
 type allBags map[string][]string
 
 func main() {
 	fmt.Println("beginning")
 	aB := parseAllBags()
-	printAllBags(&aB)
+	// printAllBags(&aB)
+	count := findCount(&aB)
+	log.Println("count:", count)
+}
+
+func findCount(aB *allBags) int {
+	count := 0
+
+	for bag := range *aB {
+		found := traverseChildren(aB, bag)
+		if found {
+			count++
+		}
+	}
+	return count
+}
+
+func traverseChildren(aB *allBags, bag string) bool {
+	for _, j := range (*aB)[bag] {
+		if j == myBag {
+			return true
+		}
+		found := traverseChildren(aB, j)
+		if found {
+			return true
+		}
+	}
+	return false
 }
 
 func parseAllBags() allBags {
